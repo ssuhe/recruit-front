@@ -1,0 +1,138 @@
+/********************* reset style *********************/
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  font-family: "Noto Sans JP", sans-serif;
+  font-optical-sizing: auto;
+}
+
+/********************* colors *********************/
+/* Example:
+ *  text-white, text-primary
+ *  bg-dark
+ *  border-sub
+ */
+$colors: (
+  primary: #4cb3f8,
+  secondary: #c8e6fa,
+  light: #f5f8fa,
+  dark: #333333,
+  gray: #4d4d4d,
+  sub: #b3b3b3,
+  white: #ffffff,
+);
+
+@each $name, $color in $colors {
+  .text-#{$name} {
+    color: $color;
+  }
+  .bg-#{$name} {
+    background-color: $color;
+  }
+  .border-#{$name} {
+    border-color: $color;
+  }
+}
+
+/********************* font-size *********************/
+/* Example:
+ *  ft-24, ft-16, ft-12
+ */
+$font-sizes: (
+  24: 24px,
+  16: 16px,
+  12: 12px,
+  10: 10px,
+);
+
+@each $key, $size in $font-sizes {
+  .ft-#{$key} {
+    font-size: $size;
+  }
+}
+
+/********************* spacing *********************/
+/* Example: (as like bootstrap
+ *  mx-1, py-4, pl-3
+ */
+@for $i from 1 through 4 {
+  $val: $i * 10px;
+
+  $types: (
+    "m": "margin",
+    "p": "padding",
+  );
+
+  @each $key, $name in $types {
+    .#{$key}-#{$i} {
+      #{$name}: $val;
+    }
+    .#{$key}x-#{$i} {
+      #{$name}-left: $val;
+      margin-right: $val;
+    }
+    .#{$key}y-#{$i} {
+      #{$name}-top: $val;
+      margin-bottom: $val;
+    }
+    .#{$key}t-#{$i} {
+      #{$name}-top: $val;
+    }
+    .#{$key}b-#{$i} {
+      #{$name}-bottom: $val;
+    }
+    .#{$key}l-#{$i} {
+      #{$name}-left: $val;
+    }
+    .#{$key}r-#{$i} {
+      #{$name}-right: $val;
+    }
+  }
+}
+
+/********************* radius *********************/
+/* Example:
+ *  rd-16, rd-8, rd-tl-8, rd-tr-16, ...
+ */
+$radiuses: (
+  16: 16px,
+  8: 8px,
+);
+
+@each $key, $size in $radiuses {
+  .rd-#{$key} {
+    border-radius: $size;
+  }
+
+  @each $side in ("top-left", "top-right", "bottom-left", "bottom-right") {
+    .rd-#{$side}-#{$key} {
+      border-#{$side}-radius: $size;
+    }
+  }
+}
+
+/********************* border *********************/
+/* Example:
+ *  border-1, border-left-1, border-bottom-3
+ */
+@for $i from 1 through 5 {
+  $val: $i * 1px;
+
+  .border-#{$i} {
+    border: $val solid;
+  }
+
+  @each $key in ("top", "left", "right", "bottom") {
+    .border-#{$key}-#{$i} {
+      border-#{$key}: $val solid;
+    }
+  }
+}
