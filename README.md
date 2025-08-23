@@ -22,4 +22,6 @@ npm run build
 ### Preview
 ```bash
 npm run preview
+
+# check http://localhost:4173
 ```
