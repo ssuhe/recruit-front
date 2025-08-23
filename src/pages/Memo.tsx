@@ -1,244 +1,138 @@
-import { useEffect, useState } from "react";
-import logo from "../assets/logo.svg";
-import editIcon from "../assets/edit.svg";
-import deleteIcon from "../assets/delete.svg";
-import plusIcon from "../assets/+.svg";
-import doneIcon from "../assets/done.svg";
-import cancelIcon from "../assets/cancel.svg";
-import saveIcon from "../assets/save.svg";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { CancelButton, EditButton, SaveButton } from "../components/Button";
+import { useParams } from "react-router";
+import { useContentContext } from "../lib/ContentContext";
+import { type responseType } from "../lib/Request";
+import { findOne, update } from "../lib/ContentFetch";
+import NotFound from "./NotFound";
 
-const base = "http://localhost:3000";
-
-const resolveUrl = (path) => {
-  return `${base}${path}`;
-};
+type nameType = "title" | "body";
 
 export default function Memo() {
-  const [titles, setTitles] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [newPages, setNewPages] = useState([]);
+  const changedRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(
+    null
+  );
 
-  const [sidebarEdit, setSidebarEdit] = useState(false);
-  const [titleEdit, setTitleEdit] = useState(false);
-  const [bodyEdit, setBodyEdit] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const textRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const handleSidebarEditClick = () => {
-    setSidebarEdit(!sidebarEdit);
-  };
+  const { contentList, setContentList } = useContentContext();
+  const { id } = useParams<{ id: string }>();
+  const numericId = useMemo(() => (id ? Number(id) : NaN), [id]);
 
-  const handleNewPageButtonClick = async () => {
-    try {
-      const response = await fetch(resolveUrl("/content"), {
-        method: "POST",
-        body: JSON.stringify({
-          title: "New Page",
-          body: "",
-        }),
-        headers: {
-          "Content-type": "application/json",
-          Accept: "application/json",
-        },
-      });
+  const [selectedContent, setSelectedContent] = useState<responseType>({
+    id: numericId,
+    title: "",
+    body: "",
+  });
 
-      const result = await response.json();
-      console.log(result);
-      setTitles([...titles, result]);
-    } catch (error) {}
-  };
-  const handleMenuSaveButtonClick = () => {};
+  const [isEditable, setIsEditable] = useState<Record<nameType, boolean>>({
+    title: false,
+    body: false,
+  });
 
-  const handleTitleEditClick = () => {
-    if (titleEdit) {
-      setSelected(titles.find((t) => t.id === selected.id));
-    }
-    setTitleEdit(!titleEdit);
-  };
-
-  const handleSaveBody = async () => {
-    try {
-      if (confirm("Update?")) {
-        const response = await fetch(resolveUrl(`/content/${selected.id}`), {
-          method: "PUT",
-          body: JSON.stringify({
-            body: selected.body,
-          }),
-          headers: {
-            "Content-type": "application/json",
-            Accept: "application/json",
-          },
-        });
-
-        if (response.status !== 200) throw new Error("Error");
-        alert("Updated!");
-        handleTitleEditClick();
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const handleSaveTitle = async () => {
-    try {
-      if (confirm("Update?")) {
-        const response = await fetch(resolveUrl(`/content/${selected.id}`), {
-          method: "PUT",
-          body: JSON.stringify({
-            title: selected.title,
-          }),
-          headers: {
-            "Content-type": "application/json",
-            Accept: "application/json",
-          },
-        });
-
-        if (response.status !== 200) throw new Error("Error");
-        alert("Updated!");
-        handleTitleEditClick();
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const handleBodyEditClick = () => {
-    if (bodyEdit) {
-      setSelected(titles.find((t) => t.id === selected.id));
-    }
-    setBodyEdit(!bodyEdit);
-  };
-
-  const handleSelect = (id) => () => {
-    setSelected(titles.find((title) => title.id === id));
-  };
-
-  const deletePage = (id) => async () => {
-    try {
-      if (confirm(`Deleted ? ${id}`)) {
-        const response = await fetch(resolveUrl(`/content/${id}`), {
-          method: "DELETE",
-        });
-        if (response.status !== 204) throw new Error("Error");
-        alert("Deleted!");
-        setTitles(titles.filter((t) => t.id !== id));
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const getData = async () => {
-    try {
-      const response = await fetch(resolveUrl("/content"));
-      const result = await response.json();
-      setTitles(result);
-
-      if (result.length > 0) {
-        setSelected(result[0]);
-      }
-    } catch (error) {}
+  const handleToggle = (name: nameType) => () => {
+    setIsEditable((prev) => ({ ...prev, [name]: !prev[name] }));
+    changedRef.current = name === "body" ? textRef.current : inputRef.current;
   };
 
   useEffect(() => {
-    getData();
-  }, []);
+    if (changedRef && changedRef.current) changedRef.current.focus();
+  }, [isEditable]);
+
+  const handleChanges =
+    (name: nameType) =>
+    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = e.currentTarget.value;
+      setSelectedContent((prev) => ({
+        ...(prev ?? { id: numericId, title: "", body: "" }),
+        [name]: value,
+      }));
+    };
+
+  const handleUpdate = (name: nameType) => async () => {
+    if (!selectedContent) return;
+    if (!id) return;
+    if (!contentList) return;
+
+    const { status, result } = await update(+id, {
+      [name]: selectedContent[name],
+    });
+
+    if (status) {
+      const newContentList = contentList.map((content) =>
+        content.id === +id ? (result as responseType) : content
+      );
+
+      console.log(newContentList);
+      setContentList(newContentList);
+    }
+  };
+
+  useEffect(() => {
+    if (!contentList || !id) {
+      setSelectedContent({ id: numericId, title: "", body: "" });
+      return;
+    }
+
+    (async () => {
+      const { status, result } = await findOne(+id);
+      console.log("exist", status);
+      if (status && result) {
+        setSelectedContent(result as responseType);
+      } else {
+        setSelectedContent({ id: NaN, title: "", body: "" });
+      }
+    })();
+
+    return () => {
+      setIsEditable({
+        title: false,
+        body: false,
+      });
+
+      changedRef.current = null;
+    };
+  }, [contentList, id, numericId]);
+
+  if (Number.isNaN(selectedContent.id)) return <NotFound />;
 
   return (
-    <div
-      style={{
-        display: "flex",
-      }}
-    >
-      <div className="pt-3 pl-4 border-right-1">
-        <div className="mb-2">
-          <img src={logo} alt="logo" />
-          <span>ServiceName</span>
-        </div>
+    <div className="page">
+      <div className="title-section">
+        <input
+          ref={inputRef}
+          onChange={handleChanges("title")}
+          value={selectedContent.title}
+          disabled={!isEditable.title}
+        />
 
-        {titles.map((title) => (
-          <div onClick={handleSelect(title.id)} key={title.id}>
-            <span>{title.title}</span>
-            {sidebarEdit && (
-              <img
-                onClick={deletePage(title.id)}
-                src={deleteIcon}
-                alt="delete-page"
-              />
-            )}
+        {isEditable.title ? (
+          <div className="button-group">
+            <CancelButton onClick={handleToggle("title")} />
+            <SaveButton onClick={handleUpdate("title")} />
           </div>
-        ))}
-
-        <div>
-          {sidebarEdit && (
-            <button onClick={handleNewPageButtonClick}>
-              <img src={plusIcon} alt="new-page" />
-              <span>New page</span>
-            </button>
-          )}
-          <button onClick={handleSidebarEditClick}>
-            <img src={sidebarEdit ? doneIcon : editIcon} alt="menu-edit" />
-            <span>{sidebarEdit ? "Done" : "Edit"}</span>
-          </button>
-        </div>
+        ) : (
+          <EditButton onClick={handleToggle("title")} />
+        )}
       </div>
-      <div>
-        <div>
-          <input
-            onChange={(e) =>
-              setSelected({ ...selected, title: e.target.value })
-            }
-            readOnly={!titleEdit}
-            value={selected ? selected.title : ""}
-          />
-          <div>
-            {titleEdit ? (
-              <>
-                <button onClick={handleTitleEditClick}>
-                  <img src={cancelIcon} alt="sidebar-edit" />
-                  <span>Cancel</span>
-                </button>
-                <button onClick={handleSaveTitle}>
-                  <img src={saveIcon} alt="sidebar-edit" />
-                  <span>Save</span>
-                </button>
-              </>
-            ) : (
-              <button onClick={handleTitleEditClick}>
-                <img src={editIcon} alt="sidebar-edit" />
-                <span>Edit</span>
-              </button>
-            )}
+
+      <div className="body-section">
+        <textarea
+          ref={textRef}
+          onChange={handleChanges("body")}
+          value={selectedContent.body}
+          disabled={!isEditable.body}
+        ></textarea>
+
+        {isEditable.body ? (
+          <div className="button-group">
+            <CancelButton onClick={handleToggle("body")} />
+            <SaveButton onClick={handleUpdate("body")} />
           </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-          }}
-        >
-          <textarea
-            onChange={(e) => setSelected({ ...selected, body: e.target.value })}
-            disabled={!bodyEdit}
-            value={selected ? selected.body : ""}
-          ></textarea>
-          <div>
-            {bodyEdit ? (
-              <>
-                <button onClick={handleBodyEditClick}>
-                  <img src={cancelIcon} alt="sidebar-edit" />
-                  <span>Cancel</span>
-                </button>
-                <button onClick={handleSaveBody}>
-                  <img src={saveIcon} alt="sidebar-edit" />
-                  <span>Save</span>
-                </button>
-              </>
-            ) : (
-              <button onClick={handleBodyEditClick}>
-                <img src={editIcon} alt="sidebar-edit" />
-                <span>Edit</span>
-              </button>
-            )}
-          </div>
-        </div>
+        ) : (
+          <EditButton onClick={handleToggle("body")} />
+        )}
       </div>
     </div>
   );

@@ -10,8 +10,9 @@ export default function Router() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Memo />}></Route>
+          <Route path="/:id" element={<Memo />}></Route>
+          <Route path="*" element={<NotFound />}></Route>
         </Route>
-        <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </BrowserRouter>
   );
