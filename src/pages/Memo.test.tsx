@@ -43,7 +43,6 @@ vi.mock("../lib/ContentFetch", () => ({
 vi.mock("react-toastify", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
-import { toast } from "react-toastify";
 
 /** ======================= Child Component Mocks ======================= */
 vi.mock("../components/Button", () => ({
