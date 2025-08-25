@@ -171,6 +171,16 @@ textarea {
   }
 }
 
+.delete-icon {
+  &:hover {
+    background-color: #e6e6e6;
+  }
+
+  &:active {
+    background-color: #cccccc;
+  }
+}
+
 #root {
   display: flex;
 

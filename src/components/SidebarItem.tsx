@@ -45,7 +45,9 @@ const SidebarItem = ({ title, id, isEditable }: SidebarItemProps) => {
       to={`/${id}`}
     >
       <span className="sidebar-link">{title}</span>
-      {isEditable && <DeleteIcon onClick={deleteContent} />}
+      {isEditable && (
+        <DeleteIcon className="delete-icon" onClick={deleteContent} />
+      )}
     </NavLink>
   );
 };
