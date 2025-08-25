@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { CancelButton, EditButton, SaveButton } from "../components/Button";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useContentContext } from "../lib/ContentContext";
 import { type responseType } from "../lib/Request";
 import { findOne, update } from "../lib/ContentFetch";
@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 type nameType = "title" | "body";
 
 export default function Memo() {
+  const navigate = useNavigate();
+
   const changedRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(
     null
   );
@@ -94,18 +96,17 @@ export default function Memo() {
   };
 
   useEffect(() => {
-    if (!contentList || !id) {
-      setSelectedContent({ id: numericId, title: "", body: "" });
+    if (id === undefined) {
+      if (contentList.length !== 0) navigate(`/${contentList[0].id}`);
       return;
     }
 
     (async () => {
-      const { status, result } = await findOne(+id);
-      console.log("exist", status);
+      const { status, result } = await findOne(parseInt(id));
       if (status && result) {
         setSelectedContent(result as responseType);
       } else {
-        setSelectedContent({ id: NaN, title: "", body: "" });
+        navigate(`/error/not-found`);
       }
     })();
 
@@ -122,7 +123,7 @@ export default function Memo() {
   if (Number.isNaN(selectedContent.id)) return <NotFound />;
 
   return (
-    <div className="page">
+    <div className="page" id={id}>
       <div className="title-section">
         <input
           ref={inputRef}
