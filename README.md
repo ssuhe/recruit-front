@@ -14,11 +14,6 @@ git clone git@github.com:ssuhe/recruit-front.git
 npm install
 ```
 
-### Build
-```bash
-npm run build
-```
-
 ### Preview
 ```bash
 npm run preview
