@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "lint": "eslint .",
-    "preview": "npm run build && vite preview",
+    "preview": "vite preview",
     "test": "vitest",
-    "build": "vitest run && tsc -b && vite build"
+    "build": "tsc -b && vite build",
+    "start": "vitest run && npm run build && npm run preview"
   },
   "dependencies": {
     "react": "^19.1.1",

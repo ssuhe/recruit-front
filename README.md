@@ -16,7 +16,7 @@ npm install
 
 ### Preview
 ```bash
-npm run preview
+npm run start
 
 # check http://localhost:4173
 ```
