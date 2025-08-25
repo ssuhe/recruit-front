@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
 
+import { ToastContainer } from "react-toastify";
+
 import type { responseType } from "../lib/Request";
 import { findAll } from "../lib/ContentFetch";
 import { ContentContextProvider } from "../lib/ContentContext";
@@ -35,6 +37,7 @@ export default function Layout() {
         <Outlet />
         <Footer />
       </div>
+      <ToastContainer />
     </ContentContextProvider>
   );
 }

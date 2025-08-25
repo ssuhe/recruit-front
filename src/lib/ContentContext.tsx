@@ -7,14 +7,16 @@ import {
 } from "react";
 import type { responseType } from "./Request";
 
-type ContentContextType = {
+export type ContentContextType = {
   contentList: responseType[];
   setContentList: Dispatch<SetStateAction<responseType[]>>;
   fetchContentList: () => Promise<responseType[] | responseType>;
 };
 
 // 1. Create the context with a proper type
-const ContentContext = createContext<ContentContextType | undefined>(undefined);
+export const ContentContext = createContext<ContentContextType | undefined>(
+  undefined
+);
 
 // 2. Hook to use context safely
 export const useContentContext = (): ContentContextType => {

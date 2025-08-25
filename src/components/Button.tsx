@@ -33,7 +33,7 @@ const Button = ({
       className={`btn-${color} btn-${variant} btn-${size}`}
     >
       {icon}
-      <span>{text}</span>
+      <span>{text || "Click me"}</span>
     </button>
   );
 };

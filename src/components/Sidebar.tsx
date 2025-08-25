@@ -8,6 +8,7 @@ import SidebarItem from "./SidebarItem";
 import { AddButton, DoneButton, EditButton } from "./Button";
 import { Logo } from "../lib/Icons";
 
+import { toast } from "react-toastify";
 const body = {
   body: "",
   title: "New Content",
@@ -20,7 +21,10 @@ const Sidebar = () => {
   const toggleMode = () => setIsEditable(!isEditable);
   const addNewContent = async () => {
     const { status, result } = await create(body);
-    if (status) setContentList([...contentList, result as responseType]);
+    if (status) {
+      setContentList([...contentList, result as responseType]);
+      toast.success(`New Page Created: ${(result as responseType).id}`);
+    }
   };
 
   const Button = isEditable ? DoneButton : EditButton;

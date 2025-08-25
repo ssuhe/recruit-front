@@ -5,6 +5,7 @@ import { useContentContext } from "../lib/ContentContext";
 import { type responseType } from "../lib/Request";
 import { findOne, update } from "../lib/ContentFetch";
 import NotFound from "./NotFound";
+import { toast } from "react-toastify";
 
 type nameType = "title" | "body";
 
@@ -32,7 +33,17 @@ export default function Memo() {
   });
 
   const handleToggle = (name: nameType) => () => {
-    setIsEditable((prev) => ({ ...prev, [name]: !prev[name] }));
+    if (isEditable[name]) {
+      if (id !== undefined) {
+        const newContent = contentList.find((content) => content.id === +id);
+        if (newContent) {
+          setSelectedContent(newContent);
+        }
+      }
+    }
+
+    setIsEditable({ ...isEditable, [name]: !isEditable[name] });
+
     changedRef.current = name === "body" ? textRef.current : inputRef.current;
   };
 
@@ -44,6 +55,7 @@ export default function Memo() {
     (name: nameType) =>
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const value = e.currentTarget.value;
+
       setSelectedContent((prev) => ({
         ...(prev ?? { id: numericId, title: "", body: "" }),
         [name]: value,
@@ -55,6 +67,19 @@ export default function Memo() {
     if (!id) return;
     if (!contentList) return;
 
+    if (name === "title") {
+      if (selectedContent.title.length < 1 || selectedContent.title.length > 50)
+        return toast.error("1 <= Title <= 50");
+    }
+
+    if (name === "body") {
+      if (
+        selectedContent.body.length < 10 ||
+        selectedContent.body.length > 2000
+      )
+        return toast.error("10 <= Body <= 2000");
+    }
+
     const { status, result } = await update(+id, {
       [name]: selectedContent[name],
     });
@@ -63,9 +88,8 @@ export default function Memo() {
       const newContentList = contentList.map((content) =>
         content.id === +id ? (result as responseType) : content
       );
-
-      console.log(newContentList);
       setContentList(newContentList);
+      toast.success(`Updated: ${id}`);
     }
   };
 

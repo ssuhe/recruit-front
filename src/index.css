@@ -23,6 +23,11 @@ body,
   --sub: #b3b3b3;
   --white: #ffffff;
 
+  --ft24: 24px;
+  --ft16: 16px;
+  --ft12: 12px;
+  --ft10: 10px;
+
   --rd-4: 4px;
   --rd-8: 8px;
   --rd-16: 16px;
@@ -31,14 +36,15 @@ body,
   --sp-20: 20px;
   --sp-30: 30px;
   --sp-40: 40px;
+  --sp-90: 90px;
 
-  --icon-size: 24px;
+  --icon-size: var(--ft24);
 }
 
 button {
-  --height: 40px;
+  --height: var(--sp-40);
   --max-width: 90px;
-  --min-width: 40px;
+  --min-width: var(--sp-40);
 
   display: inline-flex;
   flex-direction: column;
@@ -65,14 +71,14 @@ button {
   padding-bottom: 4px;
 
   svg {
-    height: 24px;
-    width: 24px;
+    height: var(--ft24);
+    width: var(--ft24);
     font-weight: bold;
     flex-shrink: 0;
   }
   span {
-    line-height: 10px;
-    font-size: 10px;
+    line-height: var(--ft10);
+    font-size: var(--ft10);
     font-weight: bold;
   }
 
@@ -96,6 +102,18 @@ button {
       fill: var(--white);
       stroke: var(--white);
     }
+
+    &:hover {
+      background-color: #3c8ec4;
+    }
+
+    &:active {
+      background-color: #347cab;
+    }
+
+    &:disabled {
+      background-color: #4cb3f8;
+    }
   }
 
   &.btn-outlined.btn-primary {
@@ -107,6 +125,39 @@ button {
     path {
       fill: var(--primary);
       stroke: var(--primary);
+    }
+
+    &:hover {
+      background-color: #cccccc;
+    }
+
+    &:active {
+      background-color: #b3b3b3;
+    }
+
+    &:disabled {
+      background-color: var(--white);
+    }
+  }
+
+  &.btn-filled.btn-dark {
+    color: var(--white);
+    background-color: #b3b3b3;
+    path {
+      fill: var(--white);
+      stroke: var(--white);
+    }
+
+    &:hover {
+      background-color: #999999;
+    }
+
+    &:active {
+      background-color: #808080;
+    }
+
+    &:disabled {
+      background-color: var(--white);
     }
   }
 }
@@ -133,35 +184,35 @@ textarea {
     flex-direction: column;
 
     .header {
-      padding-left: 40px;
+      padding-left: var(--sp-40);
 
       display: flex;
       align-items: center;
       gap: 4px;
-      margin-top: 30px;
+      margin-top: var(--sp-30);
       margin-bottom: 20px;
 
       span {
         font-weight: bold;
-        font-size: 24px;
-        line-height: 24px;
+        font-size: var(--ft24);
+        line-height: var(--ft24);
       }
     }
 
     .content-list {
-      padding-left: 40px;
+      padding-left: var(--sp-40);
       flex-grow: 1;
       height: 0;
       overflow: auto;
+      width: 290px;
 
       .sidebar-item {
         cursor: pointer;
-        width: 240px;
         height: 44px;
         border-radius: var(--rd-4);
         display: flex;
         justify-content: space-between;
-        font-size: 16px;
+        font-size: var(--ft16);
         padding: 10px;
         text-decoration: none;
 
@@ -192,7 +243,7 @@ textarea {
 
     .actions {
       padding: 10px;
-      padding-left: 40px;
+      padding-left: var(--sp-40);
       display: flex;
       justify-content: space-between;
       background-color: var(--light);
@@ -206,14 +257,14 @@ textarea {
     display: flex;
     flex-direction: column;
 
-    padding: 30px 40px 0 40px;
+    padding: var(--sp-30) var(--sp-40) 0 var(--sp-40);
 
     .page {
       flex-grow: 1;
       height: 0;
-      padding: 30px;
+      padding: var(--sp-30);
       background-color: var(--light);
-      border-radius: 16px;
+      border-radius: var(--ft16);
 
       display: flex;
       flex-direction: column;
@@ -226,17 +277,17 @@ textarea {
         margin-bottom: 20px;
 
         input {
-          padding: 0 30px;
+          padding: 0 var(--sp-30);
           width: 0;
           flex-grow: 1;
-          height: 40px;
+          height: var(--sp-40);
           border: none;
           outline: none;
           border-radius: 8px;
           background-color: transparent;
           color: var(--dark);
-          font-size: 24px;
-          line-height: 40px;
+          font-size: var(--ft24);
+          line-height: var(--sp-40);
 
           flex-shrink: 0;
 
@@ -265,7 +316,7 @@ textarea {
         gap: 20px;
 
         textarea {
-          padding: 26px 30px 0 30px;
+          padding: 26px var(--sp-30) 0 var(--sp-30);
           border: none;
           flex-shrink: 0;
           outline: none;

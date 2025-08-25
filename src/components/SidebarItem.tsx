@@ -5,6 +5,7 @@ import type { responseType } from "../lib/Request";
 import { deleteOne } from "../lib/ContentFetch";
 import { DeleteIcon } from "../lib/Icons";
 import { useEffect, useRef } from "react";
+import { toast } from "react-toastify";
 
 type SidebarItemProps = responseType & {
   isEditable: boolean;
@@ -18,18 +19,14 @@ const SidebarItem = ({ title, id, isEditable }: SidebarItemProps) => {
   const { contentList, setContentList } = useContentContext();
 
   const deleteContent = async () => {
-    if (confirm("Delete?")) {
-      const { status, error } = await deleteOne(id);
-      if (status) {
-        const newContentList = contentList.filter(
-          (content) => content.id !== id
-        );
-        setContentList(newContentList);
-        alert("Deleted!");
-      } else {
-        console.warn(error);
-        alert("Delete Error!");
-      }
+    const { status, error } = await deleteOne(id);
+    if (status) {
+      const newContentList = contentList.filter((content) => content.id !== id);
+      setContentList(newContentList);
+      toast.success(`Deleted: ${id}`);
+    } else {
+      console.warn(error);
+      toast.error(`Deleted Error: ${id}`);
     }
   };
 
